@@ -2,7 +2,7 @@
   <div class="container">
     <div class="header">
       <h1>WEATHER APP</h1>
-      <div class="search-bar">
+      <!-- <div class="search-bar">
         <a-input-search
           type="text"
           v-model="city"
@@ -11,8 +11,8 @@
           size="large"
           @click="searchByCity"
         />
-      </div>
-      <!-- <div class="search-bar">
+      </div> -->
+      <div class="search-bar">
         <input
           type="text"
           v-model="city"
@@ -21,7 +21,7 @@
         />
         <button @click="searchByCity"
                 class="search-button">Search</button>
-      </div> -->
+      </div>
       <br>
       <div v-if="weatherData" class="weather">
           <a-row justify="center">
@@ -65,12 +65,6 @@
                     <p class="desc">{{ forecast.description }}</p>
                   </a-card>
                 </div>
-                <!-- <p class="date">{{ forecast.date }}</p>
-                <a-flex :horizontal="value === 'horizontal'" :justify="justify">
-                  <p class="temp-max">{{ forecast.temp_max }} °C</p>
-                  <p class="temp-min">{{ forecast.temp_min }} °C</p>
-                </a-flex>
-                <p class="desc">{{ forecast.description }}</p> -->
               </a-col>
             </a-flex>
           </div>
@@ -81,7 +75,7 @@
   </div>
 </template>
 
-<script>
+<!-- <script>
 import axios from "axios";
 
 const apikey = "cd23d63d9e67d80ad3f2f23a74fce0a9";
@@ -168,6 +162,28 @@ export default {
       }
     },
   },
+}
+</script> -->
+
+<script>
+import { useStore, mapState } from 'vuex';
+
+const store = useStore();
+
+export default {
+  name: 'app',
+  mounted (){
+    store.dispatch('fetchCurrentLocationWeather');
+    store.dispatch('fetchWeatherData');
+    store.dispatch('fetchForecast');
+    store.dispatch('searchByCity');
+    store.dispatch('dayForecast');
+  },
+  computed: mapState([
+    'city',
+    'weatherData',
+    'dailyForecast'
+  ])
 }
 </script>
 
