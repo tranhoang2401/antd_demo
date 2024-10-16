@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const state = {
   weather: {},
-  forecast: [],
+  dailyForecast: [],
   loading: false,
   error: null,
 };
@@ -11,6 +11,9 @@ const state = {
 const mutations = {
   SET_WEATHER(state, weather) {
     state.weather = weather;
+  },
+  SET_DAILY_FORECAST(state, forecast) {
+    state.dailyForecast = forecast;
   },
   SET_LOADING(state, loading) {
     state.loading = loading;
@@ -39,31 +42,34 @@ const actions = {
       commit('SET_LOADING', false);
     }
   },
-  async fetchWeatherForecast({ commit }, { lat, lon }) {
-    commit('SET_LOADING', true);
-    commit('SET_ERROR', null);
+  async fetchForecast({ commit }, query) {
+    const urlcast = `http://api.openweathermap.org/data/2.5/forecast?q=${query}&units=metric&appid=cd23d63d9e67d80ad3f2f23a74fce0a9`;
     try {
-      const response = await axios.get(`https://api.openweathermap.org/data/2.5/onecall`, {
-        params: {
-          lat: lat,
-          lon: lon,
-          units: 'metric',
-          exclude: 'current,minutely,hourly,alerts',
-          APPID: 'cd23d63d9e67d80ad3f2f23a74fce0a9',
-        },
-      });
-      commit('SET_FORECAST', response.data.daily);
+      const response = await axios.get(urlcast);
+      const forecast = response.data;
+      commit('SET_DAILY_FORECAST', forecast);
     } catch (error) {
-      commit('SET_ERROR', error.response ? error.response.data.message : 'Error fetching forecast data');
-    } finally {
-      commit('SET_LOADING', false);
+      console.error("Error fetching forecast data:", error);
     }
-  }  
+  },
+  dayForecast(forecast) {
+    const dailyForecast = [];
+    for (let i = 8; i < forecast.list.length; i += 8) {
+      const date = new Date(forecast.list[i].dt * 1000);
+      dailyForecast.push({
+        date: date.toDateString(),
+        temp_max: Math.floor(forecast.list[i].main.temp_max - 273),
+        temp_min: Math.floor(forecast.list[i].main.temp_min - 273),
+        description: forecast.list[i].weather[0].description,
+      });
+    }
+    return dailyForecast;
+  }
 };
 
 const getters = {
   getWeather: (state) => state.weather,
-  getForecast: (state) => state.forecast,
+  dailyForecast: (state) => state.dailyForecast,
   isLoading: (state) => state.loading,
   getError: (state) => state.error,
 };

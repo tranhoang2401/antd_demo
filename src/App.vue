@@ -23,22 +23,33 @@
         </div>
       </div>
 
-      <!-- <div class="forecast-wrap" v-if="Array.isArray(forecast) && forecast.length > 0">
-        <h2>7-Day Forecast</h2>
-        <div class="forecast">
-          <div v-for="(day, index) in forecast" :key="index" class="forecast-day">
-            <div class="forecast-date">{{ formatDate(day.dt) }}</div>
-            <div class="forecast-temp">{{ Math.round(day.temp.day) }}°C</div>
-            <div class="forecast-weather">{{ day.weather[0].main }}</div>
-          </div>
+      <br>
+      <div v-if="weather.dailyForecast?.list" class="forecast">
+        <a-typography-title :level="3">Next days forecast</a-typography-title>
+          <a-row>
+            <a-col class="gutter-row" :span="6" v-for="(item, index) in weather.dailyForecast.list.slice(0, 16)" :key="index" :xs="24" :sm="12" :md="8" :lg="6">
+              <div style="background: #ececec; padding: 18px">
+                <a-card title="Ngày" :bordered="false" style="width: 300px; text-align: center;">
+                  <p class="date">{{ item.dt_txt }}</p>
+                    <div style="padding-left: 20%;">
+                      <a-flex :horizontal="value === 'horizontal'" :justify="justify === space-between" gap="large">
+                        <p class="temp-max">{{ item.main.temp_max }} °C</p>
+                        <p class="temp-min">{{ item.main.temp_min }} °C</p>
+                      </a-flex>
+                    </div>
+                  <p class="desc">{{ item.weather[0].description }}</p>
+                </a-card>
+              </div>
+            </a-col>
+          </a-row>
         </div>
-      </div> -->
 
-      <div v-if="loading">Loading...</div>
+        <a-spin v-if="loading" tip="Loading..."></a-spin>
       <!-- <div v-if="error">{{ error }}</div> -->
     </main>
   </div>
 </template>
+
 
 <script>
 import { mapState, mapActions } from 'vuex';
@@ -51,18 +62,19 @@ export default {
     };
   },
   computed: {
-    ...mapState([ 'weather', 'forecast', 'loading', 'error']),
+    ...mapState(['weather', 'dailyForecast', 'loading', 'error']),
   },
   methods: {
-    ...mapActions(['fetchWeather', 'fetchWeatherForecast']),
+    ...mapActions(['fetchWeather', 'fetchForecast']),
     handleSearch() {
       if (this.query.trim()) {
         this.fetchWeather(this.query);
+        this.fetchForecast(this.query)
       } else {
         this.error = 'Please enter a city name.';
       }
     },
-    dateBuilder () {
+    dateBuilder() {
       let d = new Date();
       let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -78,11 +90,11 @@ export default {
       const date = new Date(timestamp * 1000);
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
       return date.toLocaleDateString(undefined, options);
-    }
+    },
   },
-  mounted (){
-    console.log(this.$store.state.weather)
-  }
+  mounted() {
+    console.log(this.$store.state.weather);
+  },
 };
 </script>
 
@@ -96,6 +108,46 @@ export default {
 body {
   font-family: 'montserrat', sans-serif;
 }
+
+.weather-card {
+  background: #ececec; /* Màu nền nhẹ */
+  border-radius: 10px; /* Bo góc */
+  padding: 20px;
+  transition: transform 0.3s; /* Hiệu ứng chuyển động */
+}
+
+.weather-card:hover {
+  transform: translateY(-5px); /* Nâng thẻ lên khi hover */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Đổ bóng */
+}
+
+.card-content {
+  width: 100%; /* Đảm bảo thẻ card chiếm toàn bộ chiều rộng */
+  text-align: center;
+  border-radius: 10px; /* Bo góc cho thẻ card */
+}
+
+.date {
+  font-weight: bold;
+  font-size: 1.2em; 
+  color: #333; 
+}
+
+.temp-max {
+  font-size: 1.5em; 
+  color: #ff5733;
+}
+
+.temp-min {
+  font-size: 1.5em;
+  color: #337ab7;
+}
+
+.desc {
+  font-style: italic;
+  color: #666;
+}
+
 
 #app {
   background-image: url('./assets/cold-bg.jpg');
