@@ -27,7 +27,7 @@
       <div v-if="weather.dailyForecast?.list" class="forecast">
         <a-typography-title :level="3">Next days forecast</a-typography-title>
           <a-row>
-            <a-col class="gutter-row" :span="6" v-for="(item, index) in weather.dailyForecast.list.slice(0, 16)" :key="index" :xs="24" :sm="12" :md="8" :lg="6">
+            <a-col class="gutter-row" :span="6" v-for="(item, index) in weather.dailyForecast.list.slice(4, 16)" :key="index" :xs="24" :sm="12" :md="8" :lg="6">
               <div style="background: #ececec; padding: 18px">
                 <a-card title="Ngày" :bordered="false" style="width: 300px; text-align: center;">
                   <p class="date">{{ item.dt_txt }}</p>
