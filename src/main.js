@@ -6,4 +6,4 @@ import store from './store';
 
 const app = createApp(App);
 
-app.use(Antd, store).mount('#app');
+app.use(Antd).use(store).mount('#app');
