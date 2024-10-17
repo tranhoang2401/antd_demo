@@ -1,14 +1,22 @@
 <template>
   <div id="app" :class="typeof weather.weather.main !== 'undefined' && weather.weather.main.temp > 16 ? 'warm' : ''">
     <main>
+      <SwitchButton />
+      <br>
       <div class="search-box">
         <input 
           type="text" 
           class="search-bar" 
-          placeholder="Search..."
+          :placeholder="$t('search')"
           v-model="query"
           @keypress.enter="handleSearch"
+          @input="filterTowns"
         />
+        <ul v-if="filteredTowns.length">
+          <li v-for="town in filteredTowns" :key="town" @click="selectTown(town)">
+            {{ town }}
+          </li>
+        </ul>
       </div>
 
       <div class="weather-wrap" v-if="typeof weather.weather.main !== 'undefined'">
@@ -19,19 +27,19 @@
 
         <div class="weather-box">
           <div class="temp">{{ Math.round(weather.weather?.main?.temp) }}°C</div>
-          <div class="weather">{{ weather?.weather?.weather[0]?.main }}</div>
+          <div class="weather">{{ $t(`weather.forecast.description.${weather?.weather?.weather[0]?.description}`) }}</div>
         </div>
       </div>
 
       <br>
       <!-- <div v-if="weather.dailyForecast?.list" class="forecast"> -->
       <div v-if="weather.dailyForecast.length" class="forecast">
-        <a-typography-title :level="3">Next days forecast</a-typography-title>
+        <a-typography-title :level="3">{{ $t('nextdaysForecast') }}</a-typography-title>
           <a-row>
             <!-- <a-col class="gutter-row" :span="6" v-for="(item, index) in weather.dailyForecast.list.slice(4, 16)" :key="index" :xs="24" :sm="12" :md="8" :lg="6"> -->
-            <a-col class="gutter-row" :span="6" v-for="(forecast, index) in weather.dailyForecast.slice(4,16)" :key="index" :xs="24" :sm="12" :md="8" :lg="6">
+            <a-col class="gutter-row" :span="6" v-for="(forecast, index) in weather.dailyForecast.slice(4,16)" :key="index" :xs="24" :sm="12" :md="12" :lg="8" :xl="6">
               <div style="background: #ececec; padding: 18px">
-                <a-card title="Ngày" :bordered="false" style="width: 300px; text-align: center;">
+                <a-card :title="$t('weather.forecast.day')" :bordered="false" style="width: 95%; text-align: center;">
                   <p class="date">{{ forecast.date }}</p>
                     <div style="padding-left: 20%;">
                       <a-flex :horizontal="value === 'horizontal'" :justify="justify === space-between" gap="large">
@@ -39,7 +47,7 @@
                         <p class="temp-min">{{ forecast.temp_min }} °C</p>
                       </a-flex>
                     </div>
-                  <p class="desc">{{ forecast.description }}</p>
+                  <p class="desc">{{ $t(`weather.forecast.description.${forecast.description}`) }}</p>
                 </a-card>
               </div>
             </a-col>
@@ -55,12 +63,33 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import SwitchButton from './components/SwitchButton.vue';
 
 export default {
   name: 'App',
+  components: {
+    SwitchButton,
+  },
   data() {
     return {
       query: '',
+      towns: [
+        'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu', 
+        'Bắc Ninh', 'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước', 
+        'Bình Thuận', 'Cà Mau', 'Cao Bằng', 'Đà Nẵng', 'Đắk Lắk', 
+        'Đắk Nông', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Hà Giang', 
+        'Hà Nam', 'Hà Nội', 'Hà Tĩnh', 'Hải Dương', 'Hải Phòng', 
+        'Hòa Bình', 'Hậu Giang', 'Hưng Yên', 'Khánh Hòa', 'Kiên Giang', 
+        'Kon Tum', 'Lạng Sơn', 'Lào Cai', 'Long An', 'Nam Định', 
+        'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Phú Yên', 
+        'Quảng Bình', 'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 
+        'Quảng Trị', 'Sóc Trăng', 'Sơn La', 'Tây Ninh', 'Thái Bình', 
+        'Thái Nguyên', 'Thanh Hóa', 'Thừa Thiên - Huế', 'Tiền Giang', 
+        'Trà Vinh', 'Tuyên Quang', 'Vĩnh Long', 'Vĩnh Phúc', 
+        'Yên Bái', 'Thành phố Hồ Chí Minh', 'Thành phố Cần Thơ', 
+        'Thành phố Đà Nẵng', 'Thành phố Hải Phòng', 'Thành phố Nha Trang'
+      ],
+      filteredTowns: []
     };
   },
   computed: {
@@ -68,6 +97,19 @@ export default {
   },
   methods: {
     ...mapActions(['fetchWeather', 'fetchForecast']),
+    filterTowns() {
+      const queryLower = this.query.toLowerCase();
+      this.filteredTowns = this.towns.filter(town => 
+        town.toLowerCase().includes(queryLower)
+      );
+    },
+    selectTown(town) {
+      this.query = town;
+      this.filteredTowns = [];
+    },
+    changeLanguage(lang) {
+      this.$i18n.locale = lang; // Thay đổi ngôn ngữ
+    },
     handleSearch() {
       if (this.query.trim()) {
         this.fetchWeather(this.query);
@@ -78,12 +120,12 @@ export default {
     },
     dateBuilder() {
       let d = new Date();
-      let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      let months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+      let days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
-      let day = days[d.getDay()];
+      let day = this.$t(`day.${days[d.getDay()]}`);
       let date = d.getDate();
-      let month = months[d.getMonth()];
+      let month = this.$t(`month.${months[d.getMonth()]}`);
       let year = d.getFullYear();
 
       return `${day} ${date} ${month} ${year}`;
@@ -96,6 +138,7 @@ export default {
   },
   mounted() {
     console.log(this.$store.state.weather);
+    console.log()
   },
 };
 </script>
@@ -133,6 +176,20 @@ body {
   font-weight: bold;
   font-size: 1.2em; 
   color: #333; 
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  padding: 5px;
+  cursor: pointer;
+}
+
+li:hover {
+  background-color: #f0f0f0;
 }
 
 .temp-max {
@@ -241,4 +298,36 @@ main {
   font-style: italic;
   text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
 }
+
+.forecast {
+  padding: 16px; /* Padding mặc định cho forecast */
+}
+
+.forecast .a-col {
+  margin-bottom: 16px; /* Khoảng cách giữa các cột */
+}
+
+/* Media Query cho điện thoại */
+@media (max-width: 576px) {
+  .forecast .a-col {
+    padding: 8px; /* Giảm padding cho điện thoại */
+  }
+
+  .forecast .a-card {
+    width: 100%; /* Đảm bảo thẻ card chiếm toàn bộ chiều rộng */
+  }
+}
+
+/* Media Query cho iPad */
+@media (min-width: 576px) and (max-width: 768px) {
+  .forecast .a-col {
+    padding: 12px;
+    width: 40%;
+  }
+
+  .forecast .a-card {
+    width: 40%;
+  }
+}
+
 </style>
