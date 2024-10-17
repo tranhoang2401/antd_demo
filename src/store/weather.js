@@ -42,15 +42,28 @@ const actions = {
       commit('SET_LOADING', false);
     }
   },
-  async fetchForecast({ commit }, query) {
-    const urlcast = `http://api.openweathermap.org/data/2.5/forecast?q=${query}&units=metric&appid=cd23d63d9e67d80ad3f2f23a74fce0a9`;
-    try {
-      const response = await axios.get(urlcast);
-      const forecast = response.data;
-      commit('SET_DAILY_FORECAST', forecast);
-    } catch (error) {
-      console.error("Error fetching forecast data:", error);
-    }
+  // async fetchForecast({ commit }, query) {
+  //   const urlcast = `http://api.openweathermap.org/data/2.5/forecast?q=${query}&units=metric&appid=cd23d63d9e67d80ad3f2f23a74fce0a9`;
+  //   try {
+  //     const response = await axios.get(urlcast);
+  //     const forecast = response.data;
+  //     commit('SET_DAILY_FORECAST', forecast);
+  //   } catch (error) {
+  //     console.error("Error fetching forecast data:", error);
+  //   }
+  // },
+  async fetchForecast({ commit }, query ) {
+    const response = await axios.get(`http://api.openweathermap.org/data/2.5/forecast?q=${query}&units=metric&appid=cd23d63d9e67d80ad3f2f23a74fce0a9`);
+    
+    // Cắt nhỏ dữ liệu
+    const simplifiedData = response.data.list.map(item => ({
+      date: item.dt_txt,
+      temp_max: item.main.temp_max,
+      temp_min: item.main.temp_min,
+      description: item.weather[0].description,
+    }));
+    
+    commit('SET_DAILY_FORECAST', simplifiedData);
   },
   dayForecast(forecast) {
     const dailyForecast = [];

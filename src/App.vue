@@ -24,20 +24,22 @@
       </div>
 
       <br>
-      <div v-if="weather.dailyForecast?.list" class="forecast">
+      <!-- <div v-if="weather.dailyForecast?.list" class="forecast"> -->
+      <div v-if="weather.dailyForecast.length" class="forecast">
         <a-typography-title :level="3">Next days forecast</a-typography-title>
           <a-row>
-            <a-col class="gutter-row" :span="6" v-for="(item, index) in weather.dailyForecast.list.slice(4, 16)" :key="index" :xs="24" :sm="12" :md="8" :lg="6">
+            <!-- <a-col class="gutter-row" :span="6" v-for="(item, index) in weather.dailyForecast.list.slice(4, 16)" :key="index" :xs="24" :sm="12" :md="8" :lg="6"> -->
+            <a-col class="gutter-row" :span="6" v-for="(forecast, index) in weather.dailyForecast.slice(4,16)" :key="index" :xs="24" :sm="12" :md="8" :lg="6">
               <div style="background: #ececec; padding: 18px">
                 <a-card title="Ngày" :bordered="false" style="width: 300px; text-align: center;">
-                  <p class="date">{{ item.dt_txt }}</p>
+                  <p class="date">{{ forecast.date }}</p>
                     <div style="padding-left: 20%;">
                       <a-flex :horizontal="value === 'horizontal'" :justify="justify === space-between" gap="large">
-                        <p class="temp-max">{{ item.main.temp_max }} °C</p>
-                        <p class="temp-min">{{ item.main.temp_min }} °C</p>
+                        <p class="temp-max">{{ forecast.temp_max }} °C</p>
+                        <p class="temp-min">{{ forecast.temp_min }} °C</p>
                       </a-flex>
                     </div>
-                  <p class="desc">{{ item.weather[0].description }}</p>
+                  <p class="desc">{{ forecast.description }}</p>
                 </a-card>
               </div>
             </a-col>
