@@ -3,6 +3,7 @@ import { createI18n } from 'vue-i18n';
 // Các ngôn ngữ và bản dịch
 const messages = {
   en: {
+    'notFound': 'Not Found',
     'nextdaysForecast': 'Next Days Forecast',
     'search': 'Search...',
     'month': {
@@ -45,6 +46,7 @@ const messages = {
     }
   },
   vi: {
+    'notFound': 'Không tìm thấy vui lòng nhập lại!',
     'nextdaysForecast': 'Dự báo những ngày tiếp theo',
     'search': 'Tìm kiếm...',
     'month': {
@@ -90,7 +92,7 @@ const messages = {
 
 // Tạo i18n instance
 const i18n = createI18n({
-  locale: navigator.language, 
+  locale: 'vi', 
   fallbackLocale: 'en', 
   messages,
 });

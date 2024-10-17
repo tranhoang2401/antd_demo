@@ -19,7 +19,10 @@
         </ul>
       </div>
 
-      <div class="weather-wrap" v-if="typeof weather.weather.main !== 'undefined'">
+      <div class="weather-wrap" v-if="typeof weather.weather === 'undefined'">
+        {{ $t('notFound') }}
+      </div>
+      <div class="weather-wrap" v-else-if="typeof weather.weather.main !== 'undefined'">
         <div class="location-box">
           <div class="location">{{ weather.weather?.name }}, {{ weather.weather?.sys?.country }}</div>
           <div class="date">{{ dateBuilder() }}</div>
@@ -185,6 +188,7 @@ ul {
 
 li {
   padding: 5px;
+  color: yellow;
   cursor: pointer;
 }
 
