@@ -53,7 +53,7 @@ const actions = {
   //   }
   // },
   async fetchForecast({ commit }, query ) {
-    const response = await axios.get(`http://api.openweathermap.org/data/2.5/forecast?q=${query}&units=metric&appid=cd23d63d9e67d80ad3f2f23a74fce0a9`);
+    const response = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${query}&units=metric&appid=cd23d63d9e67d80ad3f2f23a74fce0a9`);
     
     // Cắt nhỏ dữ liệu
     const simplifiedData = response.data.list.map(item => ({
